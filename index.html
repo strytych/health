@@ -190,8 +190,8 @@
                             <span class="text-sm text-dark-accent font-mono font-bold bg-dark-accent/10 px-2 py-1 rounded-lg" v-if="bmiDisplay">BMI: {{ bmiDisplay }}</span>
                         </div>
                         <div class="flex gap-3 relative z-10">
-                            <input type="number" v-model="newWeight" placeholder="0.0" class="flex-1 bg-dark-bg rounded-2xl px-4 py-4 text-3xl font-bold text-center focus:outline-none focus:ring-2 focus:ring-dark-secondary/50 placeholder-gray-700">
-                            <button @click="addWeightLog" class="bg-white text-black px-8 rounded-2xl font-bold text-lg active:scale-95 transition-transform shadow-lg hover:shadow-white/20">記錄</button>
+                            <input type="number" v-model="newWeight" placeholder="0.0" class="flex-1 min-w-0 bg-dark-bg rounded-2xl px-4 py-4 text-3xl font-bold text-center focus:outline-none focus:ring-2 focus:ring-dark-secondary/50 placeholder-gray-700">
+                            <button @click="addWeightLog" class="shrink-0 bg-white text-black px-8 rounded-2xl font-bold text-lg active:scale-95 transition-transform shadow-lg hover:shadow-white/20">記錄</button>
                         </div>
                     </div>
 
