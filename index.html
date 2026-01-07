@@ -87,7 +87,7 @@
             <div class="absolute bottom-[-10%] right-[-10%] w-64 h-64 bg-dark-accent/10 rounded-full blur-[100px]"></div>
         </div>
 
-        <!-- Custom Edit Modal -->
+        <!-- Custom Edit Modal (Existing) -->
         <transition name="modal">
             <div v-if="showEditModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-md p-4">
                 <div class="bg-dark-card/90 border border-dark-border/50 w-full max-w-sm rounded-3xl p-6 shadow-2xl relative backdrop-blur-xl">
@@ -99,6 +99,26 @@
                     <div class="flex gap-3">
                         <button @click="showEditModal = false" class="flex-1 py-3.5 rounded-2xl bg-white/5 hover:bg-white/10 text-dark-secondary font-medium transition-colors">取消</button>
                         <button @click="saveEditedWeight" class="flex-1 py-3.5 rounded-2xl bg-white text-black font-bold shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:shadow-[0_0_30px_rgba(255,255,255,0.5)] transition-all">確認修改</button>
+                    </div>
+                </div>
+            </div>
+        </transition>
+
+        <!-- New Log Modal -->
+        <transition name="modal">
+            <div v-if="showAddModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-md p-4">
+                <div class="bg-dark-card/90 border border-dark-border/50 w-full max-w-sm rounded-3xl p-6 shadow-2xl relative backdrop-blur-xl">
+                    <h3 class="text-xl font-bold mb-4 tracking-tight">新增紀錄</h3>
+                    
+                    <label class="text-xs text-dark-secondary mb-1.5 block font-medium ml-1">日期</label>
+                    <input type="date" v-model="addDateInput" class="appearance-none w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-xl font-bold font-mono text-center text-white mb-4 focus:outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all">
+                    
+                    <label class="text-xs text-dark-secondary mb-1.5 block font-medium ml-1">體重 (kg)</label>
+                    <input type="number" v-model="addWeightInput" class="appearance-none w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-3xl font-bold text-center text-white mb-6 focus:outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all" placeholder="0.0">
+                    
+                    <div class="flex gap-3">
+                        <button @click="showAddModal = false" class="flex-1 py-3.5 rounded-2xl bg-white/5 hover:bg-white/10 text-dark-secondary font-medium transition-colors">取消</button>
+                        <button @click="saveNewLog" class="flex-1 py-3.5 rounded-2xl bg-white text-black font-bold shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:shadow-[0_0_30px_rgba(255,255,255,0.5)] transition-all">新增</button>
                     </div>
                 </div>
             </div>
@@ -133,23 +153,15 @@
         <!-- Main Content -->
         <div v-if="!showOnboarding" class="flex-1 flex flex-col z-10 overflow-hidden">
             
-            <header class="px-6 pt-12 pb-4 flex justify-between items-center bg-dark-bg/80 backdrop-blur-xl sticky top-0 z-20 h-[88px] border-b border-white/5">
-                <div v-if="currentTab === 'stats'">
-                    <!-- Removed title as requested previously -->
-                </div>
-                <div v-else></div>
-                <div @click="currentTab = 'settings'" class="p-2.5 bg-dark-card/50 hover:bg-dark-card rounded-full border border-dark-border cursor-pointer active:scale-90 transition-all">
-                    <i class="ph ph-gear text-xl text-gray-300"></i>
-                </div>
-            </header>
+            <!-- Removed Header Completely for Minimalism -->
 
             <main class="flex-1 overflow-hidden relative">
                 
                 <!-- Tab 1: Stats & Water -->
-                <div v-show="currentTab === 'stats'" class="h-full overflow-y-auto no-scrollbar px-6 pb-32 animate-fade-in space-y-6">
+                <div v-show="currentTab === 'stats'" class="h-full overflow-y-auto no-scrollbar pt-14 px-6 pb-32 animate-fade-in space-y-6">
                     
-                    <!-- Water Tracker Card (Moved Here) -->
-                    <div class="bg-dark-card border border-dark-border rounded-[2rem] p-6 shadow-2xl mt-6 relative overflow-hidden">
+                    <!-- Water Tracker Card -->
+                    <div class="bg-dark-card border border-dark-border rounded-[2rem] p-6 shadow-2xl relative overflow-hidden">
                         <div class="absolute -left-10 -top-10 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
                         
                         <div class="flex justify-between items-start mb-4 relative z-10">
@@ -186,7 +198,12 @@
                         <div class="absolute -right-10 -top-10 w-32 h-32 bg-green-500/5 rounded-full blur-3xl pointer-events-none"></div>
                         
                         <div class="flex justify-between items-end mb-4 relative z-10">
-                            <label class="text-sm text-dark-secondary font-medium">今日體重記錄</label>
+                            <div class="flex items-center gap-2">
+                                <label class="text-sm text-dark-secondary font-medium">今日體重記錄</label>
+                                <button @click="openAddModal" class="bg-dark-card/50 hover:bg-white/10 border border-white/10 rounded-lg p-1.5 text-dark-secondary hover:text-white transition-colors active:scale-95">
+                                    <i class="ph-bold ph-plus text-sm"></i>
+                                </button>
+                            </div>
                             <span class="text-sm text-dark-accent font-mono font-bold bg-dark-accent/10 px-2 py-1 rounded-lg" v-if="bmiDisplay">BMI: {{ bmiDisplay }}</span>
                         </div>
                         <div class="flex gap-3 relative z-10">
@@ -221,8 +238,9 @@
                 </div>
 
                 <!-- Tab 3: Settings -->
-                <div v-show="currentTab === 'settings'" class="h-full overflow-y-auto no-scrollbar px-6 pb-32 space-y-6">
-                    <div class="bg-dark-card border border-dark-border rounded-3xl p-6 mt-4">
+                <div v-show="currentTab === 'settings'" class="h-full overflow-y-auto no-scrollbar pt-14 px-6 pb-32 space-y-6">
+                    <h2 class="text-2xl font-bold px-2">設定</h2>
+                    <div class="bg-dark-card border border-dark-border rounded-3xl p-6">
                         <h3 class="text-lg font-bold mb-4 border-b border-dark-border pb-2">個人檔案</h3>
                         <div class="space-y-4">
                             <div><label class="text-xs text-dark-secondary">身高 (cm)</label><input type="number" v-model="user.height" @change="saveData" class="w-full bg-dark-bg p-3 rounded-xl border border-dark-border mt-1"></div>
@@ -245,7 +263,6 @@
                     <i :class="currentTab === 'stats' ? 'ph-fill' : 'ph'" class="ph-chart-bar text-2xl group-active:scale-95 transition-transform"></i>
                     <span class="text-[10px] font-medium font-sans">數據</span>
                 </button>
-                <!-- Removed Water Tab -->
                 <button @click="currentTab = 'settings'" :class="currentTab === 'settings' ? 'text-white' : 'text-dark-secondary'" class="flex flex-col items-center gap-1 w-24 group">
                     <i :class="currentTab === 'settings' ? 'ph-fill' : 'ph'" class="ph-user text-2xl group-active:scale-95 transition-transform"></i>
                     <span class="text-[10px] font-medium font-sans">設定</span>
@@ -262,9 +279,16 @@
                 const showOnboarding = ref(true);
                 const currentTab = ref('stats');
                 const newWeight = ref('');
+                
+                // Existing edit modal state
                 const showEditModal = ref(false);
                 const editWeightInput = ref('');
                 const editingLogIndex = ref(-1);
+
+                // New log modal state
+                const showAddModal = ref(false);
+                const addDateInput = ref('');
+                const addWeightInput = ref('');
 
                 let weightChartInstance = null;
                 let bmiChartInstance = null;
@@ -278,14 +302,17 @@
                     streak: 0,
                     lastGoalDate: null, 
                     buttons: [150, 300, 500],
-                    petCount: 0, // Kept for data structure compatibility but unused visually
+                    petCount: 0, 
                     dailyGoal: 3000
                 });
 
+                // 修改圖表寬度計算邏輯：以 15 筆為基準
                 const chartWidth = computed(() => {
                     const count = weightLogs.value.length;
-                    if (count <= 7) return '100%';
-                    return Math.max(window.innerWidth - 80, count * 50) + 'px';
+                    const maxVisible = 15;
+                    if (count <= maxVisible) return '100%';
+                    // 若超過 15 筆，寬度按比例增加 (例如 30 筆時寬度為 200%，即需滑動查看)
+                    return `${(count / maxVisible) * 100}%`;
                 });
 
                 const editingLogDate = computed(() => {
@@ -302,7 +329,6 @@
                     return '#a855f7';
                 };
 
-                // Water progress
                 const getProgressPercent = computed(() => {
                     const percentage = (waterData.todayTotal / waterData.dailyGoal) * 100;
                     return Math.min(percentage, 100);
@@ -355,17 +381,69 @@
                     return (w / (h_m * h_m)).toFixed(1);
                 }
 
+                // Standardized date format helper (MM/DD)
+                const getFormattedDate = (dateObj) => {
+                    const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+                    const dd = String(dateObj.getDate()).padStart(2, '0');
+                    return `${mm}/${dd}`;
+                };
+
                 const addWeightLog = () => {
                     if (!newWeight.value) return;
                     const w = parseFloat(newWeight.value);
                     const bmi = calcBmi(w, user.height);
-                    const todayStr = new Date().toLocaleDateString('zh-TW', { month: '2-digit', day: '2-digit' });
-                    const lastLog = weightLogs.value[weightLogs.value.length - 1];
-                    if (lastLog && lastLog.date === todayStr) { lastLog.weight = w; lastLog.bmi = bmi; } 
-                    else { weightLogs.value.push({ date: todayStr, weight: w, bmi: bmi }); }
+                    
+                    const todayStr = getFormattedDate(new Date());
+
+                    const existingIndex = weightLogs.value.findIndex(l => l.date === todayStr);
+                    if (existingIndex >= 0) { 
+                        weightLogs.value[existingIndex].weight = w; 
+                        weightLogs.value[existingIndex].bmi = bmi; 
+                    } else { 
+                        weightLogs.value.push({ date: todayStr, weight: w, bmi: bmi }); 
+                        weightLogs.value.sort((a, b) => a.date.localeCompare(b.date));
+                    }
                     newWeight.value = '';
                     saveData();
                     updateCharts();
+                };
+
+                const openAddModal = () => {
+                    const now = new Date();
+                    const yyyy = now.getFullYear();
+                    const mm = String(now.getMonth() + 1).padStart(2, '0');
+                    const dd = String(now.getDate()).padStart(2, '0');
+                    addDateInput.value = `${yyyy}-${mm}-${dd}`;
+                    addWeightInput.value = '';
+                    showAddModal.value = true;
+                };
+
+                const saveNewLog = () => {
+                    if(!addDateInput.value || !addWeightInput.value) return;
+                    
+                    // Parse input date YYYY-MM-DD to MM/DD
+                    const parts = addDateInput.value.split('-'); 
+                    const dateStr = `${parts[1]}/${parts[2]}`;
+                    const w = parseFloat(addWeightInput.value);
+                    const bmi = calcBmi(w, user.height);
+
+                    const existingIndex = weightLogs.value.findIndex(l => l.date === dateStr);
+                    if(existingIndex >= 0) {
+                        if(confirm(`日期 ${dateStr} 已有紀錄，是否覆蓋？`)) {
+                            weightLogs.value[existingIndex].weight = w;
+                            weightLogs.value[existingIndex].bmi = bmi;
+                        } else {
+                            return; // User cancelled override
+                        }
+                    } else {
+                        weightLogs.value.push({ date: dateStr, weight: w, bmi: bmi });
+                        // Sort by date string (Simple string sort works for MM/DD in same year context)
+                        weightLogs.value.sort((a, b) => a.date.localeCompare(b.date));
+                    }
+
+                    saveData();
+                    updateCharts();
+                    showAddModal.value = false;
                 };
 
                 const openEditModal = (index) => {
@@ -403,6 +481,16 @@
 
                 const resetAllData = () => {
                     if(confirm('確定要刪除所有資料並重置嗎？')) { localStorage.clear(); location.reload(); }
+                };
+
+                // 新增自動捲動到最新的函式
+                const scrollChartsToEnd = () => {
+                    setTimeout(() => {
+                        const wrappers = document.querySelectorAll('.chart-scroll-wrapper');
+                        wrappers.forEach(w => {
+                            if(w) w.scrollLeft = w.scrollWidth;
+                        });
+                    }, 100);
                 };
 
                 const initCharts = () => {
@@ -447,6 +535,7 @@
                         }, 
                         options: commonOptions 
                     });
+                    scrollChartsToEnd(); // 初始化時捲動到最右邊
                 };
 
                 const updateCharts = () => {
@@ -461,6 +550,7 @@
                     bmiChartInstance.data.datasets[0].pointBackgroundColor = weightLogs.value.map(l => getBmiColor(l.bmi));
                     bmiChartInstance.data.datasets[0].pointBorderColor = weightLogs.value.map(l => getBmiColor(l.bmi));
                     bmiChartInstance.update();
+                    scrollChartsToEnd(); // 更新資料時捲動到最右邊
                 };
 
                 watch(currentTab, (newVal) => {
@@ -477,7 +567,8 @@
                 return {
                     showOnboarding, currentTab, user, tempUser, completeOnboarding, newWeight, addWeightLog, bmiDisplay, waterData, addWater,
                     saveData, resetAllData, getProgressPercent,
-                    showEditModal, editWeightInput, saveEditedWeight, editingLogDate, chartWidth
+                    showEditModal, editWeightInput, saveEditedWeight, editingLogDate, chartWidth,
+                    showAddModal, addDateInput, addWeightInput, openAddModal, saveNewLog
                 };
             }
         }).mount('#app');
